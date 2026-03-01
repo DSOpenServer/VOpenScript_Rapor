@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOpenScript Rapor — PHP 8 Rapor Modülü</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #0a0e17;
+            --bg2:       #0f1521;
+            --bg3:       #151d2e;
+            --border:    #1e2d45;
+            --accent:    #00d4ff;
+            --accent2:   #7c3aed;
+            --accent3:   #10b981;
+            --text:      #e2e8f0;
+            --muted:     #64748b;
+            --code-bg:   #0d1117;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── Grid noise overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 60px;
+            background: rgba(10,14,23,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo span { color: var(--text); }
+
+        nav ul {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+        }
+
+        nav ul a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        nav ul a:hover { color: var(--accent); }
+
+        .nav-github {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text) !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s !important;
+        }
+
+        .nav-github:hover {
+            border-color: var(--accent) !important;
+            background: rgba(0,212,255,0.05) !important;
+            color: var(--accent) !important;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            overflow: hidden;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .hero-glow2 {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+            top: 30%;
+            right: 15%;
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(0,212,255,0.08);
+            border: 1px solid rgba(0,212,255,0.2);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 28px;
+            animation: fadeDown 0.6s ease forwards;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 80px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            animation: fadeDown 0.7s ease 0.1s both;
+        }
+
+        .hero h1 .line1 { display: block; color: var(--text); }
+        .hero h1 .line2 {
+            display: block;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            max-width: 560px;
+            font-size: 17px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 40px;
+            animation: fadeDown 0.7s ease 0.2s both;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeDown 0.7s ease 0.3s both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: var(--accent);
+            color: #000;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 30px rgba(0,212,255,0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(0,212,255,0.4);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background: rgba(0,212,255,0.05);
+        }
+
+        /* ── Hero code snippet ── */
+        .hero-code {
+            margin-top: 64px;
+            width: 100%;
+            max-width: 640px;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            text-align: left;
+            animation: fadeUp 0.8s ease 0.4s both;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.r { background: #ff5f57; }
+        .dot.y { background: #ffbd2e; }
+        .dot.g { background: #28ca41; }
+
+        .code-filename {
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .code-body {
+            padding: 22px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .code-body .kw  { color: #c792ea; }
+        .code-body .fn  { color: #82aaff; }
+        .code-body .str { color: #c3e88d; }
+        .code-body .cm  { color: #546e7a; }
+        .code-body .var { color: #f07178; }
+        .code-body .acc { color: var(--accent); }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+            overflow: hidden;
+        }
+
+        .stat-item {
+            flex: 1;
+            max-width: 220px;
+            padding: 28px 24px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .stat-item:last-child { border-right: none; }
+        .stat-item:hover { background: rgba(0,212,255,0.03); }
+
+        .stat-num {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* ── SECTIONS ── */
+        section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .section-label::before {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+
+        .section-desc {
+            font-size: 16px;
+            color: var(--muted);
+            max-width: 520px;
+            line-height: 1.7;
+        }
+
+        /* ── FEATURES ── */
+        #ozellikler {
+            padding: 100px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: var(--bg2);
+            padding: 36px 32px;
+            transition: background 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover { background: var(--bg3); }
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon.blue   { background: rgba(0,212,255,0.1);   color: var(--accent); }
+        .feature-icon.purple { background: rgba(124,58,237,0.1);  color: #a78bfa; }
+        .feature-icon.green  { background: rgba(16,185,129,0.1);  color: var(--accent3); }
+        .feature-icon.orange { background: rgba(251,146,60,0.1);  color: #fb923c; }
+        .feature-icon.red    { background: rgba(239,68,68,0.1);   color: #f87171; }
+        .feature-icon.teal   { background: rgba(20,184,166,0.1);  color: #2dd4bf; }
+
+        .feature-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.3px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* ── ARCHITECTURE ── */
+        #mimari {
+            padding: 100px 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .arch-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-top: 60px;
+        }
+
+        .arch-diagram {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 2;
+        }
+
+        .arch-node {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .arch-node:hover { border-color: var(--border); }
+        .arch-node.main  { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.2); color: var(--accent); font-weight: 700; }
+        .arch-node.sub   { background: rgba(124,58,237,0.06); color: #a78bfa; padding-left: 30px; }
+        .arch-node.sub2  { background: rgba(16,185,129,0.06); color: var(--accent3); padding-left: 30px; }
+        .arch-node.sub3  { background: rgba(251,146,60,0.06); color: #fb923c; padding-left: 30px; }
+        .arch-node.desc  { background: transparent; color: var(--muted); font-size: 11px; padding-left: 30px; margin-bottom: 14px; }
+
+        .arch-arrow { color: var(--muted); font-size: 11px; }
+
+        .arch-list { list-style: none; }
+        .arch-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .arch-list li:last-child { border-bottom: none; }
+
+        .arch-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .arch-list h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .arch-list p  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+        /* ── CODE DOCS ── */
+        #kullanim {
+            padding: 100px 0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0;
+            overflow-x: auto;
+            margin-top: 50px;
+        }
+
+        .tab-btn {
+            padding: 12px 22px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        .tab-panel {
+            display: none;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .tab-panel.active { display: block; }
+
+        .tab-panel pre {
+            padding: 28px 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+            color: var(--text);
+        }
+
+        .tab-panel .kw  { color: #c792ea; }
+        .tab-panel .fn  { color: #82aaff; }
+        .tab-panel .str { color: #c3e88d; }
+        .tab-panel .cm  { color: #546e7a; }
+        .tab-panel .var { color: #f07178; }
+        .tab-panel .acc { color: var(--accent); }
+        .tab-panel .num { color: #f78c6c; }
+
+        /* ── KURULUM ── */
+        #kurulum {
+            padding: 100px 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+        }
+
+        .steps {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            background: var(--bg2);
+            transition: background 0.2s;
+        }
+
+        .step:hover { background: var(--bg3); }
+
+        .step-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        .step-content { padding: 28px 32px; }
+
+        .step-content h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.65;
+            margin-bottom: 14px;
+        }
+
+        .step-code {
+            display: inline-block;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            line-height: 1.6;
+        }
+
+        /* ── GÜVENLIK ── */
+        #guvenlik {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .security-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: border-color 0.2s;
+        }
+
+        .security-card:hover { border-color: rgba(0,212,255,0.3); }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .sec-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .sec-icon.ok  { background: rgba(16,185,129,0.12); }
+        .sec-icon.bad { background: rgba(239,68,68,0.12); text-decoration: line-through; }
+
+        .sec-before {
+            background: rgba(239,68,68,0.05);
+            border: 1px solid rgba(239,68,68,0.15);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #f87171;
+            margin-bottom: 8px;
+        }
+
+        .sec-after {
+            background: rgba(16,185,129,0.05);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent3);
+        }
+
+        .sec-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+            padding: 48px 40px;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .footer-logo span { color: var(--muted); }
+
+        .footer-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--text); }
+
+        .footer-copy {
+            font-size: 12px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            nav { padding: 16px 24px; }
+            nav ul { display: none; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+            .arch-layout { grid-template-columns: 1fr; }
+            .security-grid { grid-template-columns: 1fr; }
+            .container { padding: 0 24px; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-item { min-width: 50%; border-right: none; border-bottom: 1px solid var(--border); }
+        }
+
+        @media (max-width: 600px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .step { grid-template-columns: 60px 1fr; }
+            .hero h1 { letter-spacing: -1px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ NAV ═══════════════════════════════════ -->
+<nav>
+    <div class="nav-logo">VOpen<span>Script</span>_Rapor</div>
+    <ul>
+        <li><a href="#ozellikler">Özellikler</a></li>
+        <li><a href="#mimari">Mimari</a></li>
+        <li><a href="#kullanim">Kullanım</a></li>
+        <li><a href="#kurulum">Kurulum</a></li>
+        <li><a href="#guvenlik">Güvenlik</a></li>
+    </ul>
+    <a href="https://github.com/DSOpenServer/VOpenScript_Rapor" class="nav-github" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+    </a>
+</nav>
+
+<!-- ═══════════════════════════════════ HERO ══════════════════════════════════ -->
+<section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+
+    <div class="hero-badge">
+        <div class="badge-dot"></div>
+        PHP 8 · PDO · MIT Lisans
+    </div>
+
+    <h1>
+        <span class="line1">Modüler Rapor</span>
+        <span class="line2">Üretim Sistemi</span>
+    </h1>
+
+    <p class="hero-desc">
+        SQL Injection koruması, XSS filtresi ve temiz katmanlı mimariyle
+        geliştirilmiş PHP 8 rapor modülü. Tek satırla rapor oluşturun,
+        CSV indirin, stored procedure çalıştırın.
+    </p>
+
+    <div class="hero-actions">
+        <a href="https://github.com/DSOpenServer/VOpenScript_Rapor" class="btn-primary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub'da İncele
+        </a>
+        <a href="#kurulum" class="btn-secondary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            Kuruluma Geç
+        </a>
+    </div>
+
+    <div class="hero-code">
+        <div class="code-header">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span class="code-filename">index.php</span>
+        </div>
+        <div class="code-body"><pre><span class="cm">// Tek satır include yeterli</span>
+<span class="kw">require_once</span> <span class="acc">__DIR__</span> . <span class="str">'/cls/Raporlar.php'</span>;
+
+<span class="var">$raporlar</span> = <span class="kw">new</span> <span class="fn">Raporlar</span>(<span class="var">$pdo</span>);
+
+<span class="cm">// Filtresiz rapor</span>
+<span class="var">$raporlar</span>-><span class="fn">RaporOlustur</span>(<span class="str">'satis_raporu'</span>);
+
+<span class="cm">// Filtreli rapor — SQL Injection yok</span>
+<span class="var">$raporlar</span>-><span class="fn">RaporOlustur</span>(
+    raporad:  <span class="str">'satis_raporu'</span>,
+    where:    <span class="str">'tarih >= :bas AND tarih <= :bit'</span>,
+    kosullar: [<span class="str">':bas'</span> => <span class="str">'2025-01-01'</span>, <span class="str">':bit'</span> => <span class="str">'2025-12-31'</span>]
+);
+
+<span class="cm">// CSV indir</span>
+<span class="var">$raporlar</span>-><span class="fn">exportExcel</span>(<span class="str">'satis_raporu'</span>);
+<span class="kw">exit</span>;</pre></div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════ STATS ═════════════════════════════════ -->
+<div class="stats-bar">
+    <div class="stat-item reveal">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Sınıf Dosyası</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="stat-num">PHP 8</div>
+        <div class="stat-label">Minimum Versiyon</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Bağımlılık</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="stat-num">PDO</div>
+        <div class="stat-label">Veritabanı Katmanı</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="stat-num">MIT</div>
+        <div class="stat-label">Lisans</div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════ ÖZELLİKLER ══════════════════════════ -->
+<section id="ozellikler">
+    <div class="container">
+        <div class="reveal">
+            <div class="section-label">Özellikler</div>
+            <h2 class="section-title">İhtiyacınız olan her şey<br>tek modülde</h2>
+            <p class="section-desc">Karmaşık kurulum yok, framework bağımlılığı yok. Sadece include edin ve kullanmaya başlayın.</p>
+        </div>
+
+        <div class="features-grid reveal">
+            <div class="feature-card">
+                <div class="feature-icon blue">⚡</div>
+                <h3>Tek Satır Entegrasyon</h3>
+                <p>Sadece <code style="font-family:monospace;color:var(--accent)">Raporlar.php</code> include edin. Diğer dosyalar otomatik yüklenir.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon purple">🛡️</div>
+                <h3>SQL Injection Koruması</h3>
+                <p>Tüm sorgular PDO prepared statement ile çalışır. Kullanıcı girdisi asla doğrudan SQL'e girmez.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon green">📊</div>
+                <h3>Esnek Filtreleme</h3>
+                <p>Named placeholder sistemiyle dinamik WHERE koşulları güvenle oluşturulur ve birleştirilebilir.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon orange">📥</div>
+                <h3>CSV Export</h3>
+                <p>UTF-8 BOM ile Türkçe karakter destekli gerçek CSV. Tarayıcı doğrudan indirmeye başlar.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon red">⚙️</div>
+                <h3>Stored Procedure Desteği</h3>
+                <p>Birden fazla result set döndüren stored procedure'ler <code style="font-family:monospace;color:var(--accent)">nextRowset()</code> ile desteklenir.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon teal">🧩</div>
+                <h3>Katmanlı Mimari</h3>
+                <p>Repository, Renderer ve Exporter ayrı sınıflarda. Her biri bağımsız kullanılabilir ve test edilebilir.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════ MİMARİ ═══════════════════════════════ -->
+<section id="mimari">
+    <div class="container">
+        <div class="reveal">
+            <div class="section-label">Mimari</div>
+            <h2 class="section-title">Tek Sorumluluk<br>İlkesiyle tasarlandı</h2>
+            <p class="section-desc">Her sınıf tek bir işi yapar. Veri çekme, HTML üretme ve export birbirinden tamamen ayrılmış.</p>
+        </div>
+
+        <div class="arch-layout">
+            <div class="arch-diagram reveal">
+                <div class="arch-node main">📦 Raporlar.php <span style="color:var(--muted);font-size:11px;margin-left:auto">← Facade</span></div>
+                <div style="padding-left:20px;color:var(--muted);font-size:18px;line-height:1.4">┣━</div>
+                <div class="arch-node sub">💾 RaporRepository</div>
+                <div class="arch-node desc">Veritabanı katmanı · PDO · Prepared Stmt</div>
+                <div style="padding-left:20px;color:var(--muted);font-size:18px;line-height:1.4">┣━</div>
+                <div class="arch-node sub2">🖥️ RaporRenderer</div>
+                <div class="arch-node desc">HTML üretimi · XSS koruması · Table2Excel</div>
+                <div style="padding-left:20px;color:var(--muted);font-size:18px;line-height:1.4">┗━</div>
+                <div class="arch-node sub3">📤 RaporExporter</div>
+                <div class="arch-node desc">CSV · UTF-8 BOM · Header yönetimi</div>
+            </div>
+
+            <ul class="arch-list reveal">
+                <li>
+                    <div class="arch-num">1</div>
+                    <div>
+                        <h4>RaporRepository</h4>
+                        <p>Veritabanı sorgularını yönetir. Tablo, view ve stored procedure'den veri çeker. HTML üretmez.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="arch-num">2</div>
+                    <div>
+                        <h4>RaporRenderer</h4>
+                        <p>Repository'den aldığı veriyi HTML tabloya dönüştürür. Veritabanına hiç dokunmaz.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="arch-num">3</div>
+                    <div>
+                        <h4>RaporExporter</h4>
+                        <p>Veriyi gerçek CSV formatında dışa aktarır. HTML tablo değil, doğrudan fputcsv kullanır.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="arch-num">4</div>
+                    <div>
+                        <h4>Raporlar (Facade)</h4>
+                        <p>Tüm alt sınıfları bir araya getirir. Dışarıya tek giriş noktası sunar, geriye dönük uyumluluk sağlar.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════ KULLANIM ═════════════════════════════ -->
+<section id="kullanim">
+    <div class="container">
+        <div class="reveal">
+            <div class="section-label">Kullanım</div>
+            <h2 class="section-title">Her senaryo için<br>kod örneği</h2>
+            <p class="section-desc">Basit listeden stored procedure'e, CSV export'tan JOIN sorgusuna kadar tüm kullanım biçimleri.</p>
+        </div>
+
+        <div class="reveal">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('t1', this)">Filtresiz</button>
+                <button class="tab-btn" onclick="showTab('t2', this)">WHERE Filtre</button>
+                <button class="tab-btn" onclick="showTab('t3', this)">Stored Proc</button>
+                <button class="tab-btn" onclick="showTab('t4', this)">CSV Export</button>
+                <button class="tab-btn" onclick="showTab('t5', this)">Ham Sorgu</button>
+                <button class="tab-btn" onclick="showTab('t6', this)">Alt Sınıflar</button>
+            </div>
+
+            <div id="t1" class="tab-panel active">
+                <pre><span class="cm">// raporlar tablosunda raporad='satis_raporu' kaydı olmalı</span>
+<span class="cm">// kaynak alanı: tablo adı veya view adı</span>
+
+<span class="var">$raporlar</span> = <span class="kw">new</span> <span class="fn">Raporlar</span>(<span class="var">$pdo</span>);
+<span class="var">$raporlar</span>-><span class="fn">RaporOlustur</span>(<span class="str">'satis_raporu'</span>);</pre>
+            </div>
+
+            <div id="t2" class="tab-panel">
+                <pre><span class="cm">// WHERE cümlesi şablon, değerler ayrı geçirilir → SQL Injection yok</span>
+
+<span class="var">$where</span>    = <span class="str">'tarih >= :bas AND tarih <= :bit'</span>;
+<span class="var">$kosullar</span> = [<span class="str">':bas'</span> => <span class="str">'2025-01-01'</span>, <span class="str">':bit'</span> => <span class="str">'2025-12-31'</span>];
+
+<span class="cm">// Ek koşul dinamik olarak eklenebilir</span>
+<span class="kw">if</span> (<span class="var">$musteriId</span> > <span class="num">0</span>) {
+    <span class="var">$where</span>            .= <span class="str">' AND musteri_id = :mid'</span>;
+    <span class="var">$kosullar</span>[<span class="str">':mid'</span>]  = <span class="var">$musteriId</span>;
+}
+
+<span class="var">$raporlar</span>-><span class="fn">RaporOlustur</span>(
+    raporad:  <span class="str">'satis_raporu'</span>,
+    where:    <span class="var">$where</span>,
+    kosullar: <span class="var">$kosullar</span>
+);</pre>
+            </div>
+
+            <div id="t3" class="tab-panel">
+                <pre><span class="cm">// raporlar tablosundaki kaynak alanı: stored procedure adı</span>
+<span class="cm">// Parametreler sıralı → CALL sp_aylik_ozet('2025', '03')</span>
+
+<span class="var">$raporlar</span>-><span class="fn">RaporOlusturSSP</span>(
+    raporad:      <span class="str">'aylik_ozet'</span>,
+    parametreler: [<span class="str">'2025'</span>, <span class="str">'03'</span>],
+    kolonAdlari:  [<span class="str">'ay'</span>, <span class="str">'toplam_satis'</span>, <span class="str">'adet'</span>]
+);
+
+<span class="cm">// Birden fazla result set döndüren SP → nextRowset() ile</span>
+<span class="var">$stmt</span> = <span class="var">$pdo</span>-><span class="fn">prepare</span>(<span class="str">"CALL sp_aylik_ozet(:yil, :ay)"</span>);
+<span class="var">$stmt</span>-><span class="fn">execute</span>([<span class="str">':yil'</span> => <span class="str">'2025'</span>, <span class="str">':ay'</span> => <span class="str">'03'</span>]);
+<span class="var">$ozet</span>        = <span class="var">$stmt</span>-><span class="fn">fetch</span>(PDO::<span class="acc">FETCH_OBJ</span>);
+<span class="var">$stmt</span>-><span class="fn">nextRowset</span>();
+<span class="var">$urunDagilim</span> = <span class="var">$stmt</span>-><span class="fn">fetchAll</span>(PDO::<span class="acc">FETCH_OBJ</span>);
+<span class="var">$stmt</span>-><span class="fn">closeCursor</span>();</pre>
+            </div>
+
+            <div id="t4" class="tab-panel">
+                <pre><span class="cm">// export çağrısı HTML'den ÖNCE yapılmalı — header() gönderir</span>
+
+<span class="cm">// Filtresiz</span>
+<span class="var">$raporlar</span>-><span class="fn">exportExcel</span>(<span class="str">'satis_raporu'</span>);
+<span class="kw">exit</span>;
+
+<span class="cm">// WHERE filtreli</span>
+<span class="var">$raporlar</span>-><span class="fn">exportExcel</span>(
+    raporad:  <span class="str">'satis_raporu'</span>,
+    where:    <span class="str">'musteri_id = :mid'</span>,
+    kosullar: [<span class="str">':mid'</span> => <span class="var">$musteriId</span>]
+);
+<span class="kw">exit</span>;
+
+<span class="cm">// Stored procedure CSV</span>
+<span class="var">$exporter</span>-><span class="fn">exportCSVSSP</span>(
+    raporad:      <span class="str">'aylik_ozet'</span>,
+    parametreler: [<span class="str">'2025'</span>, <span class="str">'06'</span>],
+    kolonAdlari:  [<span class="str">'ay'</span>, <span class="str">'toplam'</span>, <span class="str">'adet'</span>]
+);
+<span class="kw">exit</span>;</pre>
+            </div>
+
+            <div id="t5" class="tab-panel">
+                <pre><span class="cm">// JOIN veya karmaşık sorgular için — rapor tanımı gerekmez</span>
+<span class="cm">// $sorgu içine kullanıcı girdisi YAZILMAZ, $kosullar ile geçirilir</span>
+
+<span class="var">$raporlar</span>-><span class="fn">RaporOlusturWithQuery</span>(
+    sorgu: <span class="str">'SELECT
+                k.ad, k.soyad, k.email,
+                COUNT(s.id)  AS satis_adeti,
+                SUM(s.tutar) AS toplam_tutar
+            FROM kullanicilar k
+            LEFT JOIN satislar s ON s.kullanici_id = k.id
+            WHERE k.durum = :durum
+            GROUP BY k.id
+            ORDER BY toplam_tutar DESC'</span>,
+    kolonAdlari: [<span class="str">'ad'</span>, <span class="str">'soyad'</span>, <span class="str">'email'</span>, <span class="str">'satis_adeti'</span>, <span class="str">'toplam_tutar'</span>],
+    kosullar:    [<span class="str">':durum'</span> => <span class="var">$durum</span>],
+    raporad:     <span class="str">'kullanici_ozeti'</span>
+);</pre>
+            </div>
+
+            <div id="t6" class="tab-panel">
+                <pre><span class="cm">// Alt sınıfları doğrudan kullanmak: HTML'i değişkene al, şablona göm</span>
+
+<span class="var">$repo</span>     = <span class="kw">new</span> <span class="fn">RaporRepository</span>(<span class="var">$pdo</span>);
+<span class="var">$renderer</span> = <span class="kw">new</span> <span class="fn">RaporRenderer</span>(<span class="var">$repo</span>);
+<span class="var">$exporter</span> = <span class="kw">new</span> <span class="fn">RaporExporter</span>(<span class="var">$repo</span>);
+
+<span class="cm">// Sadece veriyi al (nesne dizisi)</span>
+<span class="var">$satirlar</span> = <span class="var">$repo</span>-><span class="fn">getSatirlar</span>(
+    raporad:  <span class="str">'satis_raporu'</span>,
+    where:    <span class="str">'durum = :d'</span>,
+    kosullar: [<span class="str">':d'</span> => <span class="str">'tamamlandi'</span>]
+);
+
+<span class="cm">// HTML'i değişkene al</span>
+<span class="var">$html</span> = <span class="var">$renderer</span>-><span class="fn">renderRapor</span>(<span class="str">'satis_raporu'</span>);
+<span class="kw">echo</span> <span class="str">'&lt;div class="rapor"&gt;'</span> . <span class="var">$html</span> . <span class="str">'&lt;/div&gt;'</span>;</pre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════ KURULUM ══════════════════════════════ -->
+<section id="kurulum">
+    <div class="container">
+        <div class="reveal">
+            <div class="section-label">Kurulum</div>
+            <h2 class="section-title">Dakikalar içinde<br>çalışır hale gelin</h2>
+            <p class="section-desc">Framework yok, Composer yok. Dosyaları indirin, SQL'i yükleyin, çalıştırın.</p>
+        </div>
+
+        <div class="steps reveal">
+            <div class="step">
+                <div class="step-num">01</div>
+                <div class="step-content">
+                    <h3>Dosyaları İndirin</h3>
+                    <p>GitHub repo'sundan tüm dosyaları aynı klasöre koyun. Herhangi bir bağımlılık kurmanıza gerek yok.</p>
+                    <div class="step-code">
+                        C:\xampp\htdocs\projem\cls\<br>
+                        ├── Raporlar.php<br>
+                        ├── RaporRepository.php<br>
+                        ├── RaporRenderer.php<br>
+                        └── RaporExporter.php
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <div class="step-content">
+                    <h3>SQL'i Yükleyin</h3>
+                    <p><code style="font-family:monospace;color:var(--accent)">kurulum.sql</code> dosyasını phpMyAdmin'de import edin. Tablolar, view ve örnek veriler otomatik oluşur.</p>
+                    <div class="step-code">
+                        ✓ musteriler — 10 kayıt<br>
+                        ✓ urunler — 10 kayıt<br>
+                        ✓ satislar — 35 kayıt<br>
+                        ✓ v_satis_raporu — view<br>
+                        ✓ raporlar — tanım tablosu
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <div class="step-content">
+                    <h3>PDO Bağlantısını Yapılandırın</h3>
+                    <p>PDO nesnesini bir kez oluşturun ve <code style="font-family:monospace;color:var(--accent)">Raporlar</code> sınıfına iletin.</p>
+                    <div class="step-code">
+                        $pdo = new PDO(<br>
+                        &nbsp;&nbsp;'mysql:host=localhost;dbname=voidb',<br>
+                        &nbsp;&nbsp;'root', '',<br>
+                        &nbsp;&nbsp;[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]<br>
+                        );
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">04</div>
+                <div class="step-content">
+                    <h3>İlk Raporunuzu Çalıştırın</h3>
+                    <p>Tarayıcıda açın ve raporu görün. Örnek dosyalar hazır, hemen çalışır.</p>
+                    <div class="step-code">
+                        require_once __DIR__ . '/cls/Raporlar.php';<br>
+                        $raporlar = new Raporlar($pdo);<br>
+                        $raporlar->RaporOlustur('satis_raporu');
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════ GÜVENLİK ════════════════════════════ -->
+<section id="guvenlik">
+    <div class="container">
+        <div class="reveal">
+            <div class="section-label">Güvenlik</div>
+            <h2 class="section-title">Orijinalden ne<br>değişti?</h2>
+            <p class="section-desc">Eski kod birçok kritik güvenlik açığı barındırıyordu. Her biri sistematik olarak giderildi.</p>
+        </div>
+
+        <div class="security-grid reveal">
+            <div class="security-card">
+                <div class="sec-header">
+                    <div class="sec-icon">🔴</div>
+                    <div>
+                        <div style="font-weight:700;font-size:15px">SQL Injection</div>
+                        <div style="font-size:12px;color:var(--muted)">Her sorguda açık vardı</div>
+                    </div>
+                </div>
+                <div class="sec-label">Eski</div>
+                <div class="sec-before">query("SELECT * FROM ... WHERE email='$email'")</div>
+                <div class="sec-label">Yeni</div>
+                <div class="sec-after">prepare("... WHERE email = :email") → execute([':email' => $email])</div>
+            </div>
+
+            <div class="security-card">
+                <div class="sec-header">
+                    <div class="sec-icon">🔴</div>
+                    <div>
+                        <div style="font-weight:700;font-size:15px">XSS Koruması</div>
+                        <div style="font-size:12px;color:var(--muted)">Ham veri HTML'e yazılıyordu</div>
+                    </div>
+                </div>
+                <div class="sec-label">Eski</div>
+                <div class="sec-before">echo "&lt;td&gt;" . $veri->deger . "&lt;/td&gt;"</div>
+                <div class="sec-label">Yeni</div>
+                <div class="sec-after">echo "&lt;td&gt;" . htmlspecialchars($veri->deger, ENT_QUOTES) . "&lt;/td&gt;"</div>
+            </div>
+
+            <div class="security-card">
+                <div class="sec-header">
+                    <div class="sec-icon">🔴</div>
+                    <div>
+                        <div style="font-weight:700;font-size:15px">Hata Gizleme</div>
+                        <div style="font-size:12px;color:var(--muted)">@ operatörü ile hatalar bastırılıyordu</div>
+                    </div>
+                </div>
+                <div class="sec-label">Eski</div>
+                <div class="sec-before">while(@$sonuc = $dba->fetch_object($sql)) { ... }</div>
+                <div class="sec-label">Yeni</div>
+                <div class="sec-after">try { ... } catch (RuntimeException $e) { error_log($e->getMessage()); }</div>
+            </div>
+
+            <div class="security-card">
+                <div class="sec-header">
+                    <div class="sec-icon">🔴</div>
+                    <div>
+                        <div style="font-weight:700;font-size:15px">Sahte Excel Export</div>
+                        <div style="font-size:12px;color:var(--muted)">HTML tablosu .xls olarak gönderiliyordu</div>
+                    </div>
+                </div>
+                <div class="sec-label">Eski</div>
+                <div class="sec-before">header("Content-Type: application/vnd.ms-excel"); echo $htmlTablo;</div>
+                <div class="sec-label">Yeni</div>
+                <div class="sec-after">header("Content-Type: text/csv"); fputcsv($output, $satir, ';'); // Gerçek CSV</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-logo">VOpen<span>Script</span>_Rapor</div>
+        <ul class="footer-links">
+            <li><a href="https://github.com/DSOpenServer/VOpenScript_Rapor" target="_blank">GitHub</a></li>
+            <li><a href="#kurulum">Kurulum</a></li>
+            <li><a href="#kullanim">Kullanım</a></li>
+            <li><a href="#guvenlik">Güvenlik</a></li>
+        </ul>
+        <div class="footer-copy">PHP 8 · PDO · MIT © 2025</div>
+    </div>
+</footer>
+
+<script>
+    // ── Tab switching ──
+    function showTab(id, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
