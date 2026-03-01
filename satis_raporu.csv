@@ -1,0 +1,36 @@
+﻿satis_id;tarih;musteri;sehir;urun;kategori;adet;birim_fiyat;tutar;durum
+1;2024-01-15;"Ahmet Yilmaz";Istanbul;"Laptop Pro 15";Bilgisayar;1;24999.00;24999.00;tamamlandi
+2;2024-01-20;"Ahmet Yilmaz";Istanbul;"Mekanik Klavye";Aksesuar;2;1299.00;2598.00;tamamlandi
+21;2024-11-05;"Ahmet Yilmaz";Istanbul;"Webcam HD";Kamera;1;1499.00;1499.00;tamamlandi
+31;2025-02-03;"Ahmet Yilmaz";Istanbul;"Tablet 10""";Tablet;1;6499.00;6499.00;tamamlandi
+3;2024-02-05;"Ayse Kaya";Ankara;"27"" Monitör";Ekran;1;8999.00;8999.00;tamamlandi
+4;2024-02-10;"Ayse Kaya";Ankara;"Kablosuz Mouse";Aksesuar;1;549.00;549.00;tamamlandi
+22;2024-11-11;"Ayse Kaya";Ankara;"Laptop Pro 15";Bilgisayar;1;24999.00;24999.00;tamamlandi
+32;2025-02-17;"Ayse Kaya";Ankara;"Akıllı Saat";Giyilebilir;1;4299.00;4299.00;tamamlandi
+5;2024-03-12;"Mehmet Demir";Izmir;"Laptop Pro 15";Bilgisayar;1;24999.00;24999.00;tamamlandi
+6;2024-03-18;"Mehmet Demir";Izmir;"Kulaküstü Kulaklık";Ses;1;2999.00;2999.00;tamamlandi
+23;2024-11-20;"Mehmet Demir";Izmir;"Kablosuz Mouse";Aksesuar;2;549.00;1098.00;tamamlandi
+33;2025-03-05;"Mehmet Demir";Izmir;"27"" Monitör";Ekran;1;8999.00;8999.00;tamamlandi
+7;2024-04-22;"Fatma Celik";Bursa;"Tablet 10""";Tablet;1;6499.00;6499.00;tamamlandi
+8;2024-04-25;"Fatma Celik";Bursa;"USB-C Hub";Aksesuar;2;799.00;1598.00;tamamlandi
+24;2024-12-02;"Fatma Celik";Bursa;"Mekanik Klavye";Aksesuar;1;1299.00;1299.00;tamamlandi
+34;2025-03-12;"Fatma Celik";Bursa;"Laptop Pro 15";Bilgisayar;1;24999.00;24999.00;tamamlandi
+9;2024-05-14;"Ali Sahin";Antalya;"Webcam HD";Kamera;1;1499.00;1499.00;tamamlandi
+10;2024-05-20;"Ali Sahin";Antalya;"Akıllı Saat";Giyilebilir;1;4299.00;4299.00;tamamlandi
+25;2024-12-10;"Ali Sahin";Antalya;"27"" Monitör";Ekran;1;8999.00;8999.00;tamamlandi
+35;2025-03-20;"Ali Sahin";Antalya;"SSD 1TB";Depolama;3;1899.00;5697.00;tamamlandi
+11;2024-06-08;"Zeynep Arslan";Adana;"SSD 1TB";Depolama;2;1899.00;3798.00;iptal
+26;2024-12-14;"Zeynep Arslan";Adana;"Kulaküstü Kulaklık";Ses;1;2999.00;2999.00;beklemede
+12;2024-07-03;"Mustafa Ozturk";Istanbul;"Laptop Pro 15";Bilgisayar;1;24999.00;24999.00;tamamlandi
+13;2024-07-03;"Mustafa Ozturk";Istanbul;"Mekanik Klavye";Aksesuar;1;1299.00;1299.00;tamamlandi
+14;2024-07-03;"Mustafa Ozturk";Istanbul;"Kablosuz Mouse";Aksesuar;1;549.00;549.00;tamamlandi
+27;2024-12-18;"Mustafa Ozturk";Istanbul;"SSD 1TB";Depolama;2;1899.00;3798.00;tamamlandi
+15;2024-08-11;"Elif Yildirim";Ankara;"27"" Monitör";Ekran;2;8999.00;17998.00;tamamlandi
+16;2024-08-15;"Elif Yildirim";Ankara;"Kulaküstü Kulaklık";Ses;1;2999.00;2999.00;beklemede
+28;2025-01-07;"Elif Yildirim";Ankara;"USB-C Hub";Aksesuar;1;799.00;799.00;tamamlandi
+17;2024-09-06;"Hasan Kurt";Konya;"USB-C Hub";Aksesuar;3;799.00;2397.00;tamamlandi
+18;2024-09-20;"Hasan Kurt";Konya;"SSD 1TB";Depolama;1;1899.00;1899.00;tamamlandi
+29;2025-01-14;"Hasan Kurt";Konya;"Laptop Pro 15";Bilgisayar;1;24999.00;24999.00;tamamlandi
+19;2024-10-18;"Merve Ozkan";Trabzon;"Tablet 10""";Tablet;1;6499.00;6499.00;tamamlandi
+20;2024-10-25;"Merve Ozkan";Trabzon;"Akıllı Saat";Giyilebilir;2;4299.00;8598.00;tamamlandi
+30;2025-01-22;"Merve Ozkan";Trabzon;"Webcam HD";Kamera;2;1499.00;2998.00;tamamlandi
